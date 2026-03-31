@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: logicuba-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: logicuba
+      POSTGRES_PASSWORD: password_segura_a_cambiar
+      POSTGRES_DB: logicubadb
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logicuba -d logicubadb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: logicuba-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bot-telegram:
+    build:
+      context: ./bot-telegram
+      dockerfile: Dockerfile
+    container_name: logicuba-telegram-bot
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://logicuba:password_segura_a_cambiar@postgres:5432/logicubadb
+      - REDIS_URL=redis://redis:6379
+      - TELEGRAM_TOKEN=tu_token_de_telegram_aqui

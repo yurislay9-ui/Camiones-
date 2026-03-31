@@ -10,7 +10,8 @@ services:
       POSTGRES_PASSWORD: password_segura_a_cambiar
       POSTGRES_DB: logicubadb
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      # Using an anonymous volume now to ensure a fresh start
+      # - ./postgres-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
@@ -35,7 +36,7 @@ services:
 
   bot-telegram:
     build:
-      context: ./bot-telegram
+      context: ../bot-telegram
       dockerfile: Dockerfile
     container_name: logicuba-telegram-bot
     restart: always

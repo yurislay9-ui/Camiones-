@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+
+# Docker data
+fase-1/infra/postgres-data/
+
+# IDE / Editor specific
+.idx/
+
+# Lock files
+package-lock.json

@@ -1,20 +1,19 @@
-import { Markup, Telegraf } from 'telegraf';
+import { Telegraf } from 'telegraf';
+import { MyContext } from '../types/context.types'; // Import the unified context
+import { InlineKeyboardMarkup } from 'telegraf/types';
 
-export function setupStartHandler(bot: Telegraf) {
-    bot.start((ctx) => {
-        const welcomeMessage = `¡Bienvenido a LogiCuba!
+export function setupStartHandler(bot: Telegraf<MyContext>) {
+    bot.start(async (ctx) => {
+        const keyboard: InlineKeyboardMarkup = {
+            inline_keyboard: [
+                [{ text: 'Soy Cliente', callback_data: 'register_client' }],
+                [{ text: 'Soy Camionero', callback_data: 'register_trucker' }]
+            ]
+        };
 
-Tu solución para la logística de cargas en Cuba.
-
-Aquí puedes:
-- Publicar una carga que necesites transportar.
-- Encontrar un viaje disponible para tu carga.
-
-¿Cómo quieres empezar?`;
-
-        return ctx.replyWithMarkdown(welcomeMessage, Markup.inlineKeyboard([
-            [Markup.button.callback('Soy Camionero', 'register_driver')],
-            [Markup.button.callback('Soy Cliente', 'register_client')]
-        ]));
+        await ctx.reply(
+            '¡Bienvenido a LogiCuba! ¿Eres un cliente que necesita enviar una carga o un camionero que busca transportarla?',
+            { reply_markup: keyboard }
+        );
     });
 }

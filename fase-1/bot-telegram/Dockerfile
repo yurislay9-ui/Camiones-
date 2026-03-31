@@ -16,8 +16,8 @@ COPY . .
 # Compila el código de TypeScript a JavaScript
 RUN npm run build
 
-# Expone el puerto en el que correrá el bot (opcional, buena práctica)
-# EXPOSE 3000
+# Asegúrate de que el script de entrada sea ejecutable
+RUN chmod +x /usr/src/app/entrypoint.sh
 
-# Comando para ejecutar la aplicación compilada
-CMD [ "node", "dist/index.js" ]
+# Establece el script de entrada como el punto de entrada del contenedor
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

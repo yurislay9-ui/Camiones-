@@ -1,9 +1,13 @@
+
 import { Telegraf, Scenes, session } from 'telegraf';
-import { MyContext } from './types/context.types'; // Import the unified context
+import { MyContext } from './types/context.types';
 import { setupStartHandler } from './handlers/start.handler';
 import { setupRegistrationHandler, registrationScenes } from './handlers/register.handler';
 import { setupTripHandler, tripSceneInstance } from './handlers/trip.handler';
 import { setupLoadHandler, loadSceneInstance } from './handlers/load.handler';
+import { setupPublishLoadHandler, publishLoadScene } from './handlers/publish-load.handler';
+import { setupMatchHandler } from './handlers/match.handler';
+import { setupPaymentHandler, paymentScene } from './handlers/payment.handler'; // Import the new payment handler and scene
 import 'dotenv/config';
 
 const bot_token = process.env.BOT_TOKEN;
@@ -15,7 +19,7 @@ if (!bot_token) {
 const bot = new Telegraf<MyContext>(bot_token);
 
 // Combine all scenes into one array
-const allScenes = [...registrationScenes, tripSceneInstance, loadSceneInstance];
+const allScenes = [...registrationScenes, tripSceneInstance, loadSceneInstance, publishLoadScene, paymentScene]; // Add the new payment scene
 
 // The stage now uses MyContext, ensuring all scenes are compatible
 const stage = new Scenes.Stage<MyContext>(allScenes);
@@ -29,10 +33,20 @@ setupStartHandler(bot);
 setupRegistrationHandler(bot);
 setupTripHandler(bot);
 setupLoadHandler(bot);
+setupPublishLoadHandler(bot);
+setupMatchHandler(bot);
+setupPaymentHandler(bot); // This function is for consistency, even if it does nothing
+
+// Command to manually trigger the payment scene (useful for testing)
+bot.command('start_payment', (ctx) => {
+    // In a real scenario, you'd pass the matchId to the scene state
+    // This is just a basic trigger for testing purposes.
+    // Example: ctx.scene.enter('payment', { matchId: 123 });
+});
 
 // Start the bot
 bot.launch().then(() => {
-    console.log('Bot started');
+    console.log('Bot started with new features!');
 }).catch((err) => {
     console.error('Failed to start bot', err);
 });

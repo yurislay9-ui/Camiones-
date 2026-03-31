@@ -10,8 +10,6 @@ services:
       POSTGRES_PASSWORD: password_segura_a_cambiar
       POSTGRES_DB: logicubadb
     volumes:
-      # Using an anonymous volume now to ensure a fresh start
-      # - ./postgres-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
@@ -48,4 +46,17 @@ services:
     environment:
       - DATABASE_URL=postgresql://logicuba:password_segura_a_cambiar@postgres:5432/logicubadb
       - REDIS_URL=redis://redis:6379
-      - TELEGRAM_TOKEN=tu_token_de_telegram_aqui
+      - BOT_TOKEN=${BOT_TOKEN}
+
+  pagos-service:
+    build:
+      context: ../pagos-service
+      dockerfile: Dockerfile
+    container_name: logicuba-pagos-service-f1
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://logicuba:password_segura_a_cambiar@postgres:5432/logicubadb
+      - BOT_TOKEN=${BOT_TOKEN}
